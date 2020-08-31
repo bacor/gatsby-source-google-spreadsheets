@@ -1,9 +1,10 @@
 const crypto = require('crypto');
+const { type } = require('os');
 const fetchSheet = require('./lib/fetchSheet.js').default;
 
 exports.sourceNodes = async (
   { actions },
-  { spreadsheetId, credentials, apiKey },
+  { spreadsheetId, credentials, apiKey, typeName },
 ) => {
   const { createNode } = actions;
   console.log('Fetching Google Sheet', fetchSheet, spreadsheetId);
@@ -17,9 +18,11 @@ exports.sourceNodes = async (
             parent: '__SOURCE__',
             children: [],
             internal: {
-              type: `google${name.charAt(0).toUpperCase()}${name.slice(
-                1,
-              )}Sheet`,
+              type: (typeName !== undefined) 
+                ? typeName(name) 
+                : `google${name.charAt(0).toUpperCase()}${name.slice(
+                  1,
+                )}Sheet`,
               contentDigest: crypto
                 .createHash('md5')
                 .update(JSON.stringify(row))
